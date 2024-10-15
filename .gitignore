@@ -16,6 +16,7 @@ build/
 .direnv/
 .devenv/
 .envrc/
+.envrc
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
