@@ -14,8 +14,8 @@ build/
 .springBeans
 .sts4-cache
 .direnv/
-.devenv
-.envrc
+.devenv/
+.envrc/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
