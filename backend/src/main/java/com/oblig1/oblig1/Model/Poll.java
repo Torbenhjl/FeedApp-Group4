@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Poll {
@@ -22,6 +23,9 @@ public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Transient
+    private long totalVotes;
 
     private String question;
     private LocalDateTime validUntil;
@@ -39,6 +43,14 @@ public class Poll {
     // Getters and setters
     public Long getId() {
         return id;
+    }
+
+    public long getTotalVotes() {
+        return totalVotes;
+    }
+    
+    public void setTotalVotes(long totalVotes) {
+        this.totalVotes = totalVotes;
     }
 
     public void setId(Long id) {
