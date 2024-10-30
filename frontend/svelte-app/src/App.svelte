@@ -6,7 +6,6 @@
     import Polls from './Polls.svelte';
     import CreatePoll from './CreatePoll.svelte';
     import Footer from './Footer.svelte';
-
     
 
     let currentPage = 'login';  // Default page is 'login'
@@ -94,7 +93,7 @@
     {:else if currentPage === 'polls' && currentUser}
         <Polls />
     {:else if currentPage === 'createPoll' && currentUser}
-        <CreatePoll />
+        <CreatePoll on:pollCreated={() => navigateTo('polls')}/>
     {:else if currentPage === 'login'}
         <Login on:loginSuccess={() => getCurrentUser()} />
     {:else if currentPage === 'register'}

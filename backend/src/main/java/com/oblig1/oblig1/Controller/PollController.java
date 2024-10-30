@@ -30,24 +30,32 @@ public class PollController {
     public List<Poll> getAllPolls() {
         List<Poll> polls = pollService.getAllPolls();
         for (Poll poll : polls) {
-            // Ensure poll's vote options have accurate vote_count values
+            // Calculate total votes from VoteRepo for this poll
+            long totalVotes = voteService.countVotesByPoll(poll);
+            poll.setTotalVotes(totalVotes); // Ensure Poll entity has a totalVotes attribute
             for (VoteOption option : poll.getVoteOptions()) {
-                option.setVoteCount(voteService.getVoteCountForOption(option.getId())); // Fetch vote count from DB
+                option.setVoteCount(voteService.getVoteCountForOption(option.getId()));
             }
         }
         return polls;
     }
     
+    
 
     // Get a single poll by its ID
-    @GetMapping("/{pollId}")
-    public ResponseEntity<Poll> getPollById(@PathVariable Long pollId) {
-        Optional<Poll> optPoll = pollService.getPollById(pollId);
-        if (optPoll.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(optPoll.get());
+// In PollController.java
+@GetMapping("/{pollId}")
+public ResponseEntity<Poll> getPollById(@PathVariable Long pollId) {
+    Optional<Poll> optPoll = pollService.getPollById(pollId);
+    if (optPoll.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
+    Poll poll = optPoll.get();
+    int totalVotes = voteService.getTotalVoteCountByPollId(pollId); // Get total votes for the poll
+    poll.setTotalVotes(totalVotes); // Assuming you added a totalVotes field in Poll
+    return ResponseEntity.ok(poll);
+}
+
 
     // Create a new poll
     @PostMapping

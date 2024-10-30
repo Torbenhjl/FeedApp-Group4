@@ -45,6 +45,13 @@ public class VoteService {
     public long countVotesByOption(VoteOption option) {
         return voteRepo.countByOption(option);
     }
+  
+    public int getTotalVoteCountByPollId(Long pollId) {
+    Poll poll = new Poll();
+    poll.setId(pollId);
+    return (int) voteRepo.countByPoll(poll); // Casting to int for simplicity, you can use long if needed
+}
+
 
     // Count the number of votes in a specific poll
     public long countVotesByPoll(Poll poll) {
