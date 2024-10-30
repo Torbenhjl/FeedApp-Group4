@@ -26,15 +26,18 @@ public class PollController {
     @Autowired
     private VoteService voteService;
 
-    // Get all polls
     @GetMapping
     public List<Poll> getAllPolls() {
         List<Poll> polls = pollService.getAllPolls();
         for (Poll poll : polls) {
-            pollService.getPollWithVotes(poll.getId());
+            // Ensure poll's vote options have accurate vote_count values
+            for (VoteOption option : poll.getVoteOptions()) {
+                option.setVoteCount(voteService.getVoteCountForOption(option.getId())); // Fetch vote count from DB
+            }
         }
         return polls;
     }
+    
 
     // Get a single poll by its ID
     @GetMapping("/{pollId}")
@@ -92,7 +95,7 @@ public class PollController {
 
     // Delete a poll
     @DeleteMapping("/{pollId}")
-    public ResponseEntity<String> deletePoll(@PathVariable Long pollId) {
+    public ResponseEntity<String> deletePoll(@PathVariable("pollId") Long pollId) {
         Optional<Poll> optPoll = pollService.getPollById(pollId);
         if (optPoll.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Poll not found");
