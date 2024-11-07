@@ -30,7 +30,7 @@
               inherit inputs pkgs;
               modules = [
                 {
-                  packages = [ pkgs.hello pkgs.docker pkgs.nodejs ];
+                  packages = [ pkgs.docker pkgs.nodejs ];
                   languages.java.enable = true;
                   languages.java.jdk.package = pkgs.jdk21;
                   languages.java.gradle.enable = true;
