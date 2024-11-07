@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
+import com.oblig1.oblig1.Messaging.MessageService;
+import com.oblig1.oblig1.Model.*;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oblig1.oblig1.Model.Poll;
-import com.oblig1.oblig1.Model.User;
-import com.oblig1.oblig1.Model.Vote;
-import com.oblig1.oblig1.Model.VoteOption;
 import com.oblig1.oblig1.Service.PollService;
 import com.oblig1.oblig1.Service.UserService;
 import com.oblig1.oblig1.Service.VoteService;
@@ -38,6 +37,14 @@ public class VoteController {
 
     @Autowired
     private UserService userService;
+
+    private final MessageService messageService;
+
+    //Using the RabbitMQ template to send to a queue
+    @Autowired
+    public VoteController(MessageService messageService) {
+        this.messageService = messageService;
+    }
 
     @GetMapping
     public List<Vote> getAllVotes() {
@@ -107,6 +114,17 @@ public class VoteController {
         vote.setVotedAt(LocalDateTime.now());
     
         voteService.saveVote(vote);
+
+        VoteMessage voteMessage = new VoteMessage();
+        voteMessage.setPollId(pollId);
+        voteMessage.setOptionId(optionId);
+        voteMessage.setUserId(user.getId());
+        voteMessage.setVotedAt(LocalDateTime.now());
+        voteMessage.setUpvote(isUpvote);
+
+        messageService.sendVoteMessage(voteMessage);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Vote submitted successfully");
     }
     
