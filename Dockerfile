@@ -1,11 +1,11 @@
-FROM gradle:8.10.2-jdk23-alpine AS build
+FROM gradle:8.11.1-jdk21-alpine AS build
 
 WORKDIR /app
 
-COPY backend/gradlew ./
-COPY backend/gradle ./gradle
+COPY ./backend/ ./
 
 RUN chmod +x ./gradlew
+
 
 RUN ./gradlew build --no-daemon
 
@@ -18,3 +18,4 @@ COPY --from=build /app/build/libs/springbootDemo-0.0.1-SNAPSHOT.jar ./dockertest
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "dockertest.jar"]
+
