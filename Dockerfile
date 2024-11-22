@@ -2,10 +2,8 @@ FROM gradle:8.10.2-jdk23-alpine AS build
 
 WORKDIR /app
 
-COPY gradlew ./
-COPY gradle ./gradle
-
-COPY . .
+COPY backend/gradlew ./
+COPY backend/gradle ./gradle
 
 RUN chmod +x ./gradlew
 
