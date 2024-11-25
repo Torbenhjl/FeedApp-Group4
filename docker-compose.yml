@@ -46,6 +46,7 @@ services:
       - "8080:8080"
     depends_on:
       - postgresql   # Correct service name
+      - keycloak
 
   keycloak:
     container_name: feedapp-keycloak
