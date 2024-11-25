@@ -1,4 +1,4 @@
-version: '3.8'  # Use the appropriate version of Docker Compose
+version: '3.8'
 
 services:
   mongodb:
