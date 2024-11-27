@@ -17,6 +17,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,12 +33,11 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login**", "/oauth2/**").permitAll()
-                        .requestMatchers("/helloUser").hasAuthority("ROLE_user")  // Role must match
+                        .requestMatchers("/").permitAll()
+//                        .requestMatchers("/helloUser").hasAuthority("ROLE_user")  // Role must match
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")  // Keycloak will automatically redirect here for authentication
+                .oauth2Login(withDefaults()
                 )
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
