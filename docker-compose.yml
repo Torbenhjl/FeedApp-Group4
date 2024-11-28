@@ -63,13 +63,6 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_PORT: 8081
-      KC_HOSTNAME_URL: http://localhost:8081  # Use localhost for external access
-      KC_HOSTNAME_ADMIN_URL: http://localhost:8081  # Use localhost for external access
-      KC_HOSTNAME_STRICT_BACKCHANNEL: true
-      KC_HTTP_RELATIVE_PATH: /
-      KC_HTTP_ENABLED: true
-      KC_HEALTH_ENABLED: true
-      KC_METRICS_ENABLED: true
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8081;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
       interval: 30s
