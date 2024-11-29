@@ -58,9 +58,62 @@
 
     // Fetch the current user when the app loads
     onMount(() => {
-        getCurrentUser();
+        console.log("I AM HERE DIN BALLE")
     });
 
+    onMount(async () => {
+    // Step 1: Get the 'code' query parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get('code');
+
+    console.log("In new code")
+
+    if (authorizationCode) {
+      // Step 2: Exchange the authorization code for an access token
+      const tokenResponse = await fetch('http://keycloak:8081/realms/FeedApp/protocol/openid-connect/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: 'feedapp-client',
+          code: authorizationCode,
+          redirect_uri: 'http://localhost:57967/',
+          grant_type: 'authorization_code'
+        })
+      });
+
+      if (tokenResponse.ok) {
+        const data = await tokenResponse.json();
+        accessToken = data.access_token;  // Store the access token
+        // Optionally, store it in localStorage/sessionStorage for persistence
+        localStorage.setItem('accessToken', accessToken);
+        console.log('Access token:', accessToken);
+      } else {
+        console.error('Failed to exchange authorization code for token');
+      }
+    } else {
+      console.error('No authorization code found in URL');
+    }
+    });
+
+    const register = async () => {
+        const res = await fetch('http://localhost:8080/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, email }),
+
+            credentials: 'include'
+
+        });
+
+        if (res.ok) {
+            alert('Registration successful');
+            currentPage = 'login';
+        } else {
+            alert('Registration failed');
+        }
+    };
 
 
 </script>

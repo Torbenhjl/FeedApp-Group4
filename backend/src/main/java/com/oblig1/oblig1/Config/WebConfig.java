@@ -14,7 +14,8 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 // Update the allowed origin to the correct port for your Svelte app
-                registry.addMapping("/**").allowedOrigins("http://localhost:54751/")
+                registry.addMapping("/**").allowedOrigins(
+                        "http://localhost:57967, http://localhost:8080, http://keycloak:8081 http://localhost:8081")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);
