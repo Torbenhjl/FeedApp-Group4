@@ -10,6 +10,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=adminpass
+    
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -39,7 +40,7 @@ services:
       dockerfile: Dockerfile
     container_name: springbootapp
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/mydatabase  # Correct service name
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/mydatabase  # Use localhost for PostgreSQL
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
     ports:
@@ -62,9 +63,6 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_PORT: 8081
-      KC_HOSTNAME_URL: http://localhost:8081
-      KC_HOSTNAME_ADMIN_URL: http://localhost:8081
-      KC_HOSTNAME_STRICT_BACKCHANNEL: true
       KC_HTTP_RELATIVE_PATH: /
       KC_HTTP_ENABLED: true
       KC_HEALTH_ENABLED: true
@@ -76,7 +74,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 30
-  
   frontend:
     build:
       context: ./frontend/svelte-app

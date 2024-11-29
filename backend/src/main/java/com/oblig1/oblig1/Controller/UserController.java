@@ -56,16 +56,16 @@ public class UserController {
     }
 
     // Login
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession session) {
-        Optional<User> optUser = userService.loginUser(user.getUsername(), user.getPassword());
-        if (optUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
-        // Set user in session
-        session.setAttribute("user", optUser.get().getUsername());
-        return ResponseEntity.ok("Login successful");
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession session) {
+//        Optional<User> optUser = userService.loginUser(user.getUsername(), user.getPassword());
+//        if (optUser.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+//        }
+//        // Set user in session
+//        session.setAttribute("user", optUser.get().getUsername());
+//        return ResponseEntity.ok("Login successful");
+//    }
 
     // Update a user's details
     @PutMapping("/{username}")

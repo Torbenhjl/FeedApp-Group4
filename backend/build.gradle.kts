@@ -38,6 +38,8 @@ dependencies {
 	implementation("org.springframework.security:spring-security-oauth2-jose")
 	implementation ("jakarta.validation:jakarta.validation-api:3.0.2")  // Use the latest version
 	implementation ("org.hibernate.validator:hibernate-validator:7.0.2.Final")
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
 
 }
 

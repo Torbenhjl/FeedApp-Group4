@@ -1,5 +1,6 @@
 <script>
     import { onMount } from "svelte";
+    import keycloak from "./keycloak";
     
     let polls = [];
     let submitting = false;
@@ -13,6 +14,9 @@
     const getPolls = async () => {
         try {
             const res = await fetch('http://localhost:8080/api/polls', {
+                headers: {
+                'Authorization': `Bearer ${keycloak.token}`
+             },
                 credentials: 'include',
             });
             if (!res.ok) {
