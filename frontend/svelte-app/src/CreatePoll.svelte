@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
+  import keycloak from "./keycloak";
 
     let question = '';
     let voteOptions = [''];
@@ -44,9 +45,13 @@
             isPrivate  
         };
 
+        
+
         const res = await fetch('http://localhost:8080/api/polls', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keycloak.token}`
+             },
             body: JSON.stringify(pollData),
             credentials: 'include'
         });
