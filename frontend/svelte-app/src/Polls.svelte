@@ -15,8 +15,8 @@
         try {
             const res = await fetch('http://localhost:8080/api/polls', {
                 headers: {
-                'Authorization': `Bearer ${keycloak.token}`
-             },
+                    'Authorization': `Bearer ${keycloak.token}`
+                 },
                 credentials: 'include',
             });
             if (!res.ok) {
@@ -48,8 +48,11 @@
 
             const res = await fetch('http://localhost:8080/api/votes', { 
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ optionId: selectedOptionId, pollId: pollId, isUpvote }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${keycloak.token}`
+                 },
+                body: JSON.stringify({ optionId: selectedOptionId, pollId: pollId, isUpvote, user: keycloak.tokenParsed?.preferred_username }),
                 credentials: 'include'
             });
 
@@ -72,6 +75,10 @@
             try {
                 const res = await fetch(`http://localhost:8080/api/polls/${pollId}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${keycloak.token}`
+                     },
                     credentials: 'include'
                 });
 

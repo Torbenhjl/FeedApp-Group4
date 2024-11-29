@@ -29,29 +29,30 @@ public class VoteService {
     }
 
     // Check if the user has already voted in the given poll
-    public boolean hasUserVoted(Poll poll, User user) {
-        return voteRepo.existsByPollAndVotedBy(poll, user);
+    public boolean hasUserVoted(Poll poll, String username) {
+        return voteRepo.existsByPollAndVotedBy(poll, username);
     }
+
     public List<Vote> getVotesByPoll(Poll poll) {
         return voteRepo.findByPoll(poll);
     }
-    public Integer getVoteCountForOption(Long optionId) {
-    VoteOption option = voteOptionRepo.findById(optionId).orElseThrow(() -> new EntityNotFoundException("Option not found"));
-    return option.getVoteCount();
-}
 
+    public Integer getVoteCountForOption(Long optionId) {
+        VoteOption option = voteOptionRepo.findById(optionId)
+                .orElseThrow(() -> new EntityNotFoundException("Option not found"));
+        return option.getVoteCount();
+    }
 
     // Count the number of votes for a specific option
     public long countVotesByOption(VoteOption option) {
         return voteRepo.countByOption(option);
     }
-  
-    public int getTotalVoteCountByPollId(Long pollId) {
-    Poll poll = new Poll();
-    poll.setId(pollId);
-    return (int) voteRepo.countByPoll(poll); // Casting to int for simplicity, you can use long if needed
-}
 
+    public int getTotalVoteCountByPollId(Long pollId) {
+        Poll poll = new Poll();
+        poll.setId(pollId);
+        return (int) voteRepo.countByPoll(poll); // Casting to int for simplicity, you can use long if needed
+    }
 
     // Count the number of votes in a specific poll
     public long countVotesByPoll(Poll poll) {

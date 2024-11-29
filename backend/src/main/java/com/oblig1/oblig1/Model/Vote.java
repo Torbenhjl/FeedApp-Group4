@@ -15,17 +15,16 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private User votedBy;  // The user who voted
+    private String votedBy; // The user who voted
 
     @ManyToOne
-    private VoteOption option;  // The option voted for
+    private VoteOption option; // The option voted for
 
     @ManyToOne
-    private Poll poll;  // The poll the vote is associated with
+    private Poll poll; // The poll the vote is associated with
 
     @Column(nullable = false)
-    private LocalDateTime votedAt;  // Add this field for vote timestamp
+    private LocalDateTime votedAt; // Add this field for vote timestamp
 
     // Getters and setters
 
@@ -37,11 +36,11 @@ public class Vote {
         this.id = id;
     }
 
-    public User getVotedBy() {
+    public String getVotedBy() {
         return votedBy;
     }
 
-    public void setVotedBy(User votedBy) {
+    public void setVotedBy(String votedBy) {
         this.votedBy = votedBy;
     }
 
