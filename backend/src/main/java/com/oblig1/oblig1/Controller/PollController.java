@@ -15,8 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:57967", allowCredentials = "true")
+
 @RestController
+@CrossOrigin
 @RequestMapping("/api/polls")
 public class PollController {
 
