@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -21,6 +22,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -30,14 +33,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("JwkSetUri " + jwkSetUri);
+        System.out.println("RUNNING");
         return http
+                .cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+<<<<<<< HEAD
                         .requestMatchers("/login**", "/oauth2/**").permitAll()
                         .requestMatchers("/helloUser").hasAuthority("ROLE_user") // Role must match
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customAuthenticationSuccessHandler()) // Custom success handler
+=======
+                        .requestMatchers("/").permitAll()
+//                        .requestMatchers("/helloUser").hasAuthority("ROLE_user")  // Role must match
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(withDefaults()
+>>>>>>> 5c410e1a563111cdc2aa0ad64cfea840c17235d5
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
                         .jwtAuthenticationConverter(new KeycloakJwtAuthenticationConverter()).decoder(jwtDecoder()) // Map
@@ -46,6 +60,10 @@ public class SecurityConfig {
                 .build();
     }
 
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String jwkSetIss;
+
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return new SimpleUrlAuthenticationSuccessHandler("http://localhost:57967"); // Replace with your desired URL
@@ -53,9 +71,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder
-                .withJwkSetUri(jwkSetUri)
-                .jwsAlgorithm(SignatureAlgorithm.RS256).build();
+        return JwtDecoders.fromIssuerLocation(jwkSetIss);
     }
 
 }
