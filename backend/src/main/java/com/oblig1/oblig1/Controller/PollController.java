@@ -6,8 +6,13 @@ import com.oblig1.oblig1.Model.VoteOption;
 import com.oblig1.oblig1.Service.PollService;
 import com.oblig1.oblig1.Service.VoteService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,29 +65,63 @@ public ResponseEntity<Poll> getPollById(@PathVariable Long pollId) {
 
     // Create a new poll
     @PostMapping
-    public ResponseEntity<Poll> createPoll(@RequestBody Poll poll) {
-        // Set the current timestamp as publishedAt
-        System.out.println("Received Poll: " + poll.isPrivate());  // Log the value of isPrivate
-        poll.setPublishedAt(LocalDateTime.now());
-    
-        List<VoteOption> options = poll.getVoteOptions();
-    
-        // Set the order of each option and assign them to the poll
-        if (options != null) {
-            int order = 1;
-            for (VoteOption option : options) {
-                option.setPoll(poll);
-                option.setPresentationOrder(order++);
-            }
+public ResponseEntity<String> createPoll(@RequestBody Map<String, Object> pollData, HttpSession session) {
+    try {
+        System.out.println("PollData " + pollData);
+        // Extract poll details
+        String question = (String) pollData.get("question");
+        boolean isPrivate = (boolean) pollData.get("isPrivate");
+        String username = (String) pollData.get("user");
+     //   String createdBy = request.getUserPrincipal().getName(); // Get username from Keycloak token
+        LocalDateTime validUntil = LocalDateTime.parse((String) pollData.get("validUntil"));
+        List<Map<String, Object>> optionsData = (List<Map<String, Object>>) pollData.get("voteOptions");
+
+        // Validate inputs
+        if (question == null || question.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Poll question is required");
         }
-    
-        // Log the values to make sure they're correct before saving
-        System.out.println("Poll Data: " + poll);
-    
-        // Save the poll along with the validUntil and isPrivate flag
-        Poll savedPoll = pollService.savePoll(poll);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPoll);
+        if (optionsData == null || optionsData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Poll must have at least one vote option");
+        }
+
+        System.out.println("Usernae when creating poll:" + username);
+        // Create and populate Poll entity
+        Poll poll = new Poll();
+        poll.setQuestion(question);
+        poll.setPrivate(isPrivate);
+        poll.setCreatedBy(username);
+        poll.setValidUntil(validUntil);
+        poll.setPublishedAt(LocalDateTime.now());
+
+        // Process vote options
+        List<VoteOption> options = new ArrayList<>();
+        int order = 1;
+        for (Map<String, Object> optionData : optionsData) {
+            String caption = (String) optionData.get("caption");
+            if (caption == null || caption.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Each vote option must have a caption");
+            }
+            VoteOption option = new VoteOption();
+            option.setCaption(caption);
+            option.setPresentationOrder(order++);
+            option.setPoll(poll);
+            options.add(option);
+        }
+        poll.setVoteOptions(options);
+
+        // Save Poll and associated VoteOptions
+        pollService.savePoll(poll);
+
+        // Return success response
+        return ResponseEntity.status(HttpStatus.CREATED).body("Poll created successfully");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while creating the poll");
     }
+}
+
+    
+
     
 
     // Update an existing poll
