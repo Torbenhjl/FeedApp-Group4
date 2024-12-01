@@ -7,14 +7,22 @@
     let validUntil = '';  
     let isPrivate = false;  
     let currentPage = 'createPoll';
+    let user = '';
 
     const dispatch = createEventDispatcher();
 
     const addOption = () => {
         voteOptions = [...voteOptions, ''];
     };
-    
 
+    const isValidDate = (localDateTime) => {
+        const dateTime = new Date(localDateTime);
+        if(isNaN(dateTime)) {
+            return false;
+        }
+        const now = new Date();
+        return dateTime >= now;
+    }
     const removeOption = (index) => {
         if (voteOptions.length > 1) {
             voteOptions = voteOptions.filter((_, i) => i !== index);
@@ -23,46 +31,56 @@
         }
     };
 
-    const navigateTo = (page) => {
-        currentPage = page;
+    const submitPoll = async () => {
+    console.log("Submit poll running");
+    user = keycloak.tokenParsed?.preferred_username
+
+        if (!question || !validUntil || voteOptions.some(option => option === '' || !user)) {
+        alert('Please fill out all fields before submitting.');
+        return;
+    }
+    if (!isValidDate(validUntil)) {
+        console.log("Invalid date. No time travel allowed.");
+        return;
+    }
+
+    const options = voteOptions.map((option, index) => ({
+        caption: option,
+        presentationOrder: index + 1,
+    }));
+
+    const pollData = {
+        question,
+        voteOptions: options,
+        validUntil,
+        isPrivate,
+        user: keycloak.tokenParsed?.preferred_username
     };
 
-    const submitPoll = async () => {
-        if (!question || !validUntil || voteOptions.some(option => option === '')) {
-            alert('Please fill out all fields before submitting.');
-            return;
-        }
-
-        const options = voteOptions.map((option, index) => ({
-            caption: option,
-            presentationOrder: index + 1
-        }));
-
-        const pollData = {
-            question,
-            voteOptions: options,
-            validUntil,
-            isPrivate  
-        };
-
-        
-
+    try {
         const res = await fetch('http://localhost:8080/api/polls', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${keycloak.token}`
-             },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keycloak.token}`,
+            },
             body: JSON.stringify(pollData),
-            credentials: 'include'
+            credentials: 'include',
         });
 
         if (res.ok) {
             alert('Poll created successfully');
             dispatch('pollCreated');
         } else {
-            alert('Failed to create poll');
+            const errorMessage = await res.text();
+            alert(`Failed to create poll: ${errorMessage}`);
         }
-    };
+    } catch (error) {
+        console.error('Error submitting poll:', error);
+        alert('An error occurred while creating the poll.');
+    }
+};
+
 </script>
 
 <h1>Create a Poll</h1>

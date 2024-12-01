@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oblig1.oblig1.Service.PollService;
-import com.oblig1.oblig1.Service.UserService;
 import com.oblig1.oblig1.Service.VoteService;
 
 import jakarta.servlet.http.HttpSession;
@@ -34,9 +33,6 @@ public class VoteController {
 
     @Autowired
     private PollService pollService;
-
-    @Autowired
-    private UserService userService;
 
     private final MessageService messageService;
 

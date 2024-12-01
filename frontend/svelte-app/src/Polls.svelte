@@ -52,7 +52,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${keycloak.token}`
                  },
-                body: JSON.stringify({ optionId: selectedOptionId, pollId: pollId, isUpvote, user: keycloak.tokenParsed?.preferred_username }),
+                body: JSON.stringify({ optionId: selectedOptionId, pollId: pollId, isUpvote, user: keycloak.tokenParsed?.preferred_username}),
                 credentials: 'include'
             });
 

@@ -30,12 +30,12 @@ public class Poll {
     private String question;
     private LocalDateTime validUntil;
     private LocalDateTime publishedAt;
-
+    
     @JsonProperty("isPrivate")
     private boolean isPrivate;  // Add this line
 
-    @ManyToOne
-    private User createdBy;
+   
+    private String createdBy;
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteOption> voteOptions = new ArrayList<>();
@@ -89,11 +89,11 @@ public class Poll {
         this.voteOptions = voteOptions;
     }
 
-    public User getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 

@@ -1,7 +1,6 @@
 package com.oblig1.oblig1.Service;
 
 import com.oblig1.oblig1.Model.Poll;
-import com.oblig1.oblig1.Model.User;
 import com.oblig1.oblig1.Model.Vote;
 import com.oblig1.oblig1.Model.VoteOption;
 import com.oblig1.oblig1.Repo.VoteOptionRepo;
