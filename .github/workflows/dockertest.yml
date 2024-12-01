@@ -27,12 +27,12 @@ jobs:
 
       # Wait for the services to become ready (Optional)
       - name: Wait for services to be ready
-        run: sleep 130  # Adjust as needed for your app startup time
+        run: sleep 30  # Adjust as needed for your app startup time
 
       # Test if the Spring Boot is accessible, since it is dependent on the others, it will not run if the others failed.
       - name: Test Application (Simple Curl Check)
         run: |
-          curl --fail http://localhost:8080 || exit 1  
+          curl --fail http://localhost:8080/api/health || exit 1  
 
       # Shut down services
       - name: Shut Down Services
