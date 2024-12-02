@@ -1,0 +1,39 @@
+name: FeedApp application
+
+on:
+  push:
+    branches:
+      - main
+  
+
+jobs:
+  test_application:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Docker
+      - name: Set up Docker Compose
+        uses: docker/setup-buildx-action@v2
+
+      # Build and run Docker Compose services
+      - name: Build and Start Services
+        run: |
+          docker compose -f docker-compose.yml up -d
+          docker ps  # List running containers for verification
+
+      # Wait for the services to become ready (Optional)
+      - name: Wait for services to be ready
+        run: sleep 30  # Adjust as needed for your app startup time
+
+      # Test if the Spring Boot is accessible, since it is dependent on the others, it will not run if the others failed.
+      - name: Test Application (Simple Curl Check)
+        run: |
+          curl --fail http://localhost:8080/api/health || exit 1  
+
+      # Shut down services
+      - name: Shut Down Services
+        run: docker compose down

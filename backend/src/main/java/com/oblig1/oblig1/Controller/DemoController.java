@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class DemoController {
 
-    @GetMapping("/hello")
-    @PreAuthorize("hasRole('client_user')")
+    @GetMapping("/health")
     public String hello() {
-        return "Hello from Spring Boot and Keycloak1";
+        return "The application is running and healthy";
     }
 
     @GetMapping("/hello2")

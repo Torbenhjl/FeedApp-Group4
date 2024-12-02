@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oblig1.oblig1.Service.PollService;
-import com.oblig1.oblig1.Service.UserService;
 import com.oblig1.oblig1.Service.VoteService;
 
 import jakarta.servlet.http.HttpSession;
@@ -35,12 +34,9 @@ public class VoteController {
     @Autowired
     private PollService pollService;
 
-    @Autowired
-    private UserService userService;
-
     private final MessageService messageService;
 
-    //Using the RabbitMQ template to send to a queue
+    // Using the RabbitMQ template to send to a queue
     @Autowired
     public VoteController(MessageService messageService) {
         this.messageService = messageService;
@@ -56,9 +52,10 @@ public class VoteController {
     public ResponseEntity<String> submitVote(@RequestBody Map<String, Object> voteData, HttpSession session) {
         Long optionId = ((Number) voteData.get("optionId")).longValue();
         Long pollId = ((Number) voteData.get("pollId")).longValue();
-        boolean isUpvote = (boolean) voteData.get("isUpvote");  // Expect this from the frontend
+        boolean isUpvote = (boolean) voteData.get("isUpvote"); // Expect this from the frontend
+        String username = (String) voteData.get("user"); // Expect this from the frontend
         LocalDateTime now = LocalDateTime.now();
-    
+
         // Check if poll exists
         Poll poll = pollService.findPollById(pollId);
         if (poll == null) {
@@ -67,66 +64,51 @@ public class VoteController {
         for (VoteOption option : poll.getVoteOptions()) {
             option.setVoteCount(voteService.getVoteCountForOption(option.getId()));
         }
-    
-        // Check poll validity
-        if (now.isBefore(poll.getPublishedAt()) || (poll.getValidUntil() != null && now.isAfter(poll.getValidUntil()))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Voting is not allowed.");
-        }
-    
-        String username = (String) session.getAttribute("user");
+
         if (username == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username not present");
         }
-    
-        Optional<User> optionalUser = userService.findByUsername(username);
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        User user = optionalUser.get();
-    
+
         VoteOption selectedOption = pollService.findOptionById(optionId);
         if (selectedOption == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vote option not found");
         }
-    
-        if (poll.isPrivate() && voteService.hasUserVoted(poll, user)) {
+
+        if (poll.isPrivate() && voteService.hasUserVoted(poll, username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have already voted in this poll");
         }
-    
+
         if (selectedOption.getVoteCount() == null) {
-            selectedOption.setVoteCount(0);  // Initialize vote count if null
+            selectedOption.setVoteCount(0); // Initialize vote count if null
         }
-        
+
         if (isUpvote) {
             selectedOption.setVoteCount(selectedOption.getVoteCount() + 1);
         } else {
             selectedOption.setVoteCount(selectedOption.getVoteCount() - 1);
         }
-        
-    
+
         // Save the vote option and vote
         pollService.saveVoteOption(selectedOption);
-    
+
         Vote vote = new Vote();
         vote.setPoll(poll);
         vote.setOption(selectedOption);
-        vote.setVotedBy(user);
+        vote.setVotedBy(username);
         vote.setVotedAt(LocalDateTime.now());
-    
+
         voteService.saveVote(vote);
 
         VoteMessage voteMessage = new VoteMessage();
         voteMessage.setPollId(pollId);
         voteMessage.setOptionId(optionId);
-        voteMessage.setUserId(user.getId());
+        voteMessage.setUserId(username);
         voteMessage.setVotedAt(LocalDateTime.now());
         voteMessage.setUpvote(isUpvote);
 
         messageService.sendVoteMessage(voteMessage);
 
-
         return ResponseEntity.status(HttpStatus.CREATED).body("Vote submitted successfully");
     }
-    
 
 }

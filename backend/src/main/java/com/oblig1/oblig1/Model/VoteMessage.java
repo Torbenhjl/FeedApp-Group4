@@ -9,7 +9,7 @@ public class VoteMessage {
     private String id;
     private Long pollId;
     private Long optionId;
-    private Long userId;
+    private String username;
     private LocalDateTime votedAt;
     private boolean isUpvote;
 
@@ -37,12 +37,12 @@ public class VoteMessage {
         this.optionId = optionId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getUserId() {
+        return username;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserId(String username) {
+        this.username = username;
     }
 
     public LocalDateTime getVotedAt() {
