@@ -48,10 +48,6 @@ public class SecurityConfig {
 
     }
 
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String jwkSetIss;
-
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).jwsAlgorithm(SignatureAlgorithm.RS256).build();
